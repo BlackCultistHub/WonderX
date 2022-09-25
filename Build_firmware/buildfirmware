@@ -1,0 +1,32 @@
+#!/bin/bash
+# Builds project inside docker enviroment
+
+REPO="https://github.com/BlackCultistHub/WonderX.git"
+FIRMWARE_DIR="/firmware"
+LOGFILE="${FIRMWARE_DIR}/build.log"
+
+echo "Build params:"
+echo "Repo: ${REPO}"
+echo "Branch: ${REPO_BRANCH}"
+echo "Firmware dir: ${FIRMWARE_DIR}"
+echo "Build log: ${LOGFILE}"
+
+# Prepare repo
+if [[ -z $(git ls-remote --head "${REPO}" "${REPO_BRANCH}") ]]; then
+  echo "Repo doesn't seem to have target branch!"
+  exit
+fi
+
+mkdir -p "${FIRMWARE_DIR}"
+git clone "${REPO}"
+cd /WonderX
+git checkout "${REPO_BRANCH}"
+
+# Prepare enviroment
+. ${HOME}/esp/esp-idf/export.sh
+
+# Build firmware
+make all > "${LOGFILE}"
+cp -f "/WonderX/build/WonderX.elf" "${FIRMWARE_DIR}"
+cp -f "/WonderX/build/WonderX.bin" "${FIRMWARE_DIR}"
+echo "Build finished."

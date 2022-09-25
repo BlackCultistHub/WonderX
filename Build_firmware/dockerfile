@@ -1,0 +1,6 @@
+#FROM blackcultist/esp-idf_alpine_buildbox:latest
+FROM blackcultist/esp-idf_alpine_buildbox:latest
+ENV REPO_BRANCH master
+WORKDIR /
+COPY buildfirmware /sbin/buildfirmware
+CMD [ "/sbin/buildfirmware" ]

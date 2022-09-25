@@ -1,0 +1,6 @@
+Enviroment variables:
+REPO_BRANCH - repo branch to build
+
+Mounts points:
+/firmware - build results + log
+/WonderX - git repo and build

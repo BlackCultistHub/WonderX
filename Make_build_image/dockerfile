@@ -1,0 +1,3 @@
+FROM debian:latest
+COPY docker_init /etc/docker_init
+CMD [ "\etc\docker_init" ]
