@@ -3,6 +3,7 @@
 
 REPO="https://github.com/BlackCultistHub/WonderX.git"
 FIRMWARE_DIR="/firmware"
+BOOTLOADER_DIR="${FIRMWARE_DIR}/bootloader"
 CMAKE_LOGFILE="${FIRMWARE_DIR}/cmake.log"
 LOGFILE="${FIRMWARE_DIR}/build.log"
 
@@ -10,6 +11,7 @@ echo "Build params:"
 echo "Repo: ${REPO}"
 echo "Branch: ${REPO_BRANCH}"
 echo "Firmware dir: ${FIRMWARE_DIR}"
+echo "Bootloader dir: ${BOOTLOADER_DIR}"
 echo "Build log: ${LOGFILE}"
 
 # Prepare repo
@@ -19,6 +21,7 @@ if [[ -z $(git ls-remote --head "${REPO}" "${REPO_BRANCH}") ]]; then
 fi
 
 mkdir -p "${FIRMWARE_DIR}"
+mkdir -p "${BOOTLOADER_DIR}"
 git clone "${REPO}"
 cd /WonderX
 git checkout "${REPO_BRANCH}"
@@ -44,13 +47,25 @@ fi
 if [[ -f "/WonderX/build/WonderX.elf" ]]; then
   cp -f "/WonderX/build/WonderX.elf" "${FIRMWARE_DIR}"
 else
-  echo "Error. elf binary not found."
+  echo "Error. app elf binary not found."
   exit
 fi
 if [[ -f "/WonderX/build/WonderX.bin" ]]; then
   cp -f "/WonderX/build/WonderX.bin" "${FIRMWARE_DIR}"
 else
-  echo "Error. bin binary not found."
+  echo "Error. app bin binary not found."
+  exit
+fi
+if [[ -f "/WonderX/build/bootloader/bootloader.elf" ]]; then
+  cp -f "/WonderX/build/bootloader/bootloader.elf" "${FIRMWARE_DIR}"
+else
+  echo "Error. bootloader elf binary not found."
+  exit
+fi
+if [[ -f "/WonderX/build/bootloader/bootloader.bin" ]]; then
+  cp -f "/WonderX/build/bootloader/bootloader.bin" "${FIRMWARE_DIR}"
+else
+  echo "Error. bootloader bin binary not found."
   exit
 fi
 echo "Build finished."
