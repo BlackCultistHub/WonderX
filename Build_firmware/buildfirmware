@@ -3,6 +3,7 @@
 
 REPO="https://github.com/BlackCultistHub/WonderX.git"
 FIRMWARE_DIR="/firmware"
+CMAKE_LOGFILE="${FIRMWARE_DIR}/cmake.log"
 LOGFILE="${FIRMWARE_DIR}/build.log"
 
 echo "Build params:"
@@ -24,9 +25,32 @@ git checkout "${REPO_BRANCH}"
 
 # Prepare enviroment
 . ${HOME}/esp/esp-idf/export.sh
+mkdir build
+cd build
 
 # Build firmware
-make all > "${LOGFILE}"
-cp -f "/WonderX/build/WonderX.elf" "${FIRMWARE_DIR}"
-cp -f "/WonderX/build/WonderX.bin" "${FIRMWARE_DIR}"
+echo "Generating CMake..."
+cmake .. > "${CMAKE_LOGFILE}"
+
+if [[ -f "/WonderX/build/Makefile" ]]; then
+  echo "Building firmware..."
+  make > "${LOGFILE}"
+else
+  echo "Error. CMake failed."
+  exit
+fi
+
+# Copy build
+if [[ -f "/WonderX/build/WonderX.elf" ]]; then
+  cp -f "/WonderX/build/WonderX.elf" "${FIRMWARE_DIR}"
+else
+  echo "Error. elf binary not found."
+  exit
+fi
+if [[ -f "/WonderX/build/WonderX.bin" ]]; then
+  cp -f "/WonderX/build/WonderX.bin" "${FIRMWARE_DIR}"
+else
+  echo "Error. bin binary not found."
+  exit
+fi
 echo "Build finished."
