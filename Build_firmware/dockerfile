@@ -1,6 +1,6 @@
-#FROM blackcultist/esp-idf_alpine_buildbox:latest
-FROM blackcultist/esp-idf_alpine_buildbox:latest
+FROM blackcultist/esp-idf-debian-buildbox:latest
 ENV REPO_BRANCH master
 WORKDIR /
 COPY buildfirmware /sbin/buildfirmware
+RUN chmod +x /sbin/buildfirmware
 CMD [ "/sbin/buildfirmware" ]

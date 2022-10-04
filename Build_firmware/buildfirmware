@@ -12,6 +12,7 @@ echo "Repo: ${REPO}"
 echo "Branch: ${REPO_BRANCH}"
 echo "Firmware dir: ${FIRMWARE_DIR}"
 echo "Bootloader dir: ${BOOTLOADER_DIR}"
+echo "CMake log: ${CMAKE_LOGFILE}"
 echo "Build log: ${LOGFILE}"
 
 # Prepare repo
@@ -38,12 +39,17 @@ cmake .. > "${CMAKE_LOGFILE}"
 if [[ -f "/WonderX/build/Makefile" ]]; then
   echo "Building firmware..."
   make > "${LOGFILE}"
+  local rc=$?
+  if [ rc != 0 ]
+    echo "Build failed. See ${LOGFILE} for more results."
+    exit
+  fi
 else
   echo "Error. CMake failed."
   exit
 fi
 
-# Copy build
+# Copy built firmware
 if [[ -f "/WonderX/build/WonderX.elf" ]]; then
   cp -f "/WonderX/build/WonderX.elf" "${FIRMWARE_DIR}"
 else
@@ -56,16 +62,41 @@ else
   echo "Error. app bin binary not found."
   exit
 fi
+
+# Copy built bootloader
 if [[ -f "/WonderX/build/bootloader/bootloader.elf" ]]; then
-  cp -f "/WonderX/build/bootloader/bootloader.elf" "${FIRMWARE_DIR}"
+  cp -f "/WonderX/build/bootloader/bootloader.elf" "${BOOTLOADER_DIR}"
 else
   echo "Error. bootloader elf binary not found."
   exit
 fi
 if [[ -f "/WonderX/build/bootloader/bootloader.bin" ]]; then
-  cp -f "/WonderX/build/bootloader/bootloader.bin" "${FIRMWARE_DIR}"
+  cp -f "/WonderX/build/bootloader/bootloader.bin" "${BOOTLOADER_DIR}"
 else
   echo "Error. bootloader bin binary not found."
   exit
 fi
+
+# Copy Flashing Args
+if [[ -f "/WonderX/build/flash_project_args" ]]; then
+  cp -f "/WonderX/build/flash_project_args" "${FIRMWARE_DIR}"
+else
+  echo "Error. flash_project_args binary not found."
+  exit
+fi
+if [[ -f "/WonderX/build/flash_app_args" ]]; then
+  cp -f "/WonderX/build/flash_app_args" "${FIRMWARE_DIR}"
+else
+  echo "Error. flash_app_args binary not found."
+  exit
+fi
+if [[ -f "/WonderX/build/flash_bootloader_args" ]]; then
+  cp -f "/WonderX/build/flash_bootloader_args" "${FIRMWARE_DIR}"
+else
+  echo "Error. flash_bootloader_args binary not found."
+  exit
+fi
+
 echo "Build finished."
+
+echo "Done."
