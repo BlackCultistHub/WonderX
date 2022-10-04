@@ -39,8 +39,7 @@ cmake .. > "${CMAKE_LOGFILE}"
 if [[ -f "/WonderX/build/Makefile" ]]; then
   echo "Building firmware..."
   make > "${LOGFILE}"
-  local rc=$?
-  if [ rc != 0 ]
+  if [[ $? != 0 ]]; then
     echo "Build failed. See ${LOGFILE} for more results."
     exit
   fi
