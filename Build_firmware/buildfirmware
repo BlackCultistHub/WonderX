@@ -1,7 +1,14 @@
 #!/bin/bash
 # Builds project inside docker enviroment
 
-REPO="https://github.com/BlackCultistHub/WonderX.git"
+if [[ "${EXPERIMENTAL}" == "YES" ]]; then
+  REPO="https://github.com/BlackCultistHub/WonderX_experimental.git"
+else
+  REPO="https://github.com/BlackCultistHub/WonderX.git"
+fi
+if [[ -z "${REPO_BRANCH}" ]]; then
+  REPO_BRANCH="master"
+fi
 FIRMWARE_DIR="/firmware"
 BOOTLOADER_DIR="${FIRMWARE_DIR}/bootloader"
 CMAKE_LOGFILE="${FIRMWARE_DIR}/cmake.log"
