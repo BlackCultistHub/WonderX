@@ -31,7 +31,7 @@ namespace
         uint16_t elems = 0;
         for ( int i = 0; i < AVERAGING_BUFFER_SIZE; i++ )
         {
-            if ( !buffer[i] )
+            if ( buffer[i] )
             {
                 summary += buffer[i];
                 elems++;
