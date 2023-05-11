@@ -69,12 +69,14 @@ void loop()
 {
   if ( updateSpeed )
   {
+    delay( 50 );
     updateSpeed = false;
     bpc.UpdateSpeed( spdTmr );
     spdTmr.Update();
   }
   if ( updateCadence )
   {
+    delay( 50 );
     updateCadence = false;
     bpc.UpdateCadence( cadTmr );
     cadTmr.Update();

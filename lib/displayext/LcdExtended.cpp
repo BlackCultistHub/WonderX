@@ -49,16 +49,28 @@ void LcdExtended::Dimm()
 
 void LcdExtended::UpdateVelocity( uint8_t velocity )
 {
+    if ( velocity > 999 )
+    {
+        velocity = 999;
+    }
     drawControlledNumber( velocity, 1, 0 );
 }
 
 void LcdExtended::UpdateHeartrate( uint8_t heartrate )
 {
+    if ( heartrate > 999 )
+    {
+        heartrate = 999;
+    }
     drawControlledNumber( heartrate, 10, 0 );
 }
 
 void LcdExtended::UpdateCadence( uint16_t cadence )
 {
+    if ( cadence > 999 )
+    {
+        cadence = 999;
+    }
     drawControlledNumber( cadence, 1, 1 );
 }
 
