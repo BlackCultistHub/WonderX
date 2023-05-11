@@ -14,6 +14,8 @@
 #include <size_conversions.h>
 #include <simpleDoubleTimer.h>
 
+#define AVERAGING_BUFFER_SIZE 2
+
 class BikePc
 {
 
@@ -23,7 +25,7 @@ public:
     // @param[in] lcdCols amount of cols
     // @param[in] lcdRows amount of rows
     // @param[in] wheelRad radius of the wheel in mm
-    BikePc( uint8_t lcdAddress, uint8_t lcdCols, uint8_t lcdRows, uint16_t wheelRad);
+    BikePc( uint8_t lcdAddress, uint8_t lcdCols, uint8_t lcdRows, uint16_t wheelRad );
 
     // @brief Inits bikepc
     // @param[in] resetOnStart true if hard reset is needed
@@ -52,8 +54,18 @@ private:
     // @brief updates trip and odo
     int updateTripOdo();
 
+    uint16_t getVelocity( uint16_t newVelocity );
+
+    uint16_t getCadence( uint16_t newCadence );
+
+    uint8_t getHeartrate( uint8_t newHeartrate );
+
 private:
     LcdExtended lcd;
+
+    uint16_t velocityBuffer[AVERAGING_BUFFER_SIZE];
+    uint16_t cadenceBuffer[AVERAGING_BUFFER_SIZE];
+    uint8_t heartrateBuffer[AVERAGING_BUFFER_SIZE];
 
     // @brief radius of the wheel in mm
     uint16_t wheelRadius = 0;

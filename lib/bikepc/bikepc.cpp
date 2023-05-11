@@ -4,7 +4,44 @@
 
 #include "bikepc.h"
 
-BikePc::BikePc( uint8_t lcdAddress, uint8_t lcdCols, uint8_t lcdRows, uint16_t wheelRad):
+namespace
+{
+    template< typename T >
+    void AddToBuffer( T* buffer, uint16_t size, T newValue )
+    {
+        if ( AVERAGING_BUFFER_SIZE == 1 )
+        {
+            buffer[0] = newValue; 
+            return;
+        }
+
+        for ( int i = 0; i < AVERAGING_BUFFER_SIZE-1; i++ )
+        {
+            buffer[i] = buffer[i+1];
+        }
+
+        buffer[AVERAGING_BUFFER_SIZE-1] = newValue;
+        return;
+    }
+
+    template< typename T >
+    uint32_t GetBufferSummNonZero( T* buffer, uint16_t size )
+    {
+        uint32_t summary = 0;
+        uint16_t elems = 0;
+        for ( int i = 0; i < AVERAGING_BUFFER_SIZE; i++ )
+        {
+            if ( !buffer[i] )
+            {
+                summary += buffer[i];
+                elems++;
+            }
+        }
+        return (summary / elems);
+    }
+}
+
+BikePc::BikePc( uint8_t lcdAddress, uint8_t lcdCols, uint8_t lcdRows, uint16_t wheelRad ):
 lcd( lcdAddress, lcdCols, lcdRows ),
 wheelRadius( wheelRad )
 {
@@ -54,14 +91,14 @@ int BikePc::ResetTrip()
 int BikePc::UpdateSpeed( algorithms::SimpleDoubleTimer speedTimer )
 {
     // @todo error handling
-    uint8_t velocity = round( algorithms::GetCircleLinearSpeedKmh( speedTimer.GetDiff(), algorithms::ConvertMmToM( wheelRadius ) ) );
+    uint16_t velocity = round( algorithms::GetCircleLinearSpeedKmh( speedTimer.GetDiff(), algorithms::ConvertMmToM( wheelRadius ) ) );
     if ( velocity < 0 )
     {
         lcd.UpdateVelocity( 0 );
     }
     else
     {
-        lcd.UpdateVelocity( velocity );
+        lcd.UpdateVelocity( getVelocity( velocity ) );
         updateTripOdo();
     }
     return 0;
@@ -77,7 +114,7 @@ int BikePc::UpdateCadence( algorithms::SimpleDoubleTimer cadenceTimer )
     }
     else
     {
-        lcd.UpdateCadence( cadenceRpm );
+        lcd.UpdateCadence( getCadence( cadenceRpm ) );
     }
     return 0;
 }
@@ -91,7 +128,7 @@ int BikePc::UpdateHeartrate( uint8_t heartrate )
     }
     else
     {
-        lcd.UpdateHeartrate( heartrate );
+        lcd.UpdateHeartrate( getHeartrate( heartrate ) );
     }
     return 0;
 }
@@ -113,4 +150,22 @@ int BikePc::updateTripOdo()
         rideBuffer = rideBuffer - algorithms::ConvertMmToCm( algorithms::ConvertCmToMm( rideBuffer ) ); // calculate what's left
     }
     return 0;
+}
+
+uint16_t BikePc::getVelocity( uint16_t newVelocity )
+{
+    AddToBuffer( velocityBuffer, AVERAGING_BUFFER_SIZE, newVelocity );
+    return GetBufferSummNonZero( velocityBuffer, AVERAGING_BUFFER_SIZE );
+}
+
+uint16_t BikePc::getCadence( uint16_t newCadence )
+{
+    AddToBuffer( cadenceBuffer, AVERAGING_BUFFER_SIZE, newCadence );
+    return GetBufferSummNonZero( cadenceBuffer, AVERAGING_BUFFER_SIZE );
+}
+
+uint8_t BikePc::getHeartrate( uint8_t newHeartrate )
+{
+    AddToBuffer( heartrateBuffer, AVERAGING_BUFFER_SIZE, newHeartrate );
+    return GetBufferSummNonZero( heartrateBuffer, AVERAGING_BUFFER_SIZE );
 }
