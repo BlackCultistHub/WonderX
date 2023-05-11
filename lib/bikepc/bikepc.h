@@ -14,7 +14,7 @@
 #include <size_conversions.h>
 #include <simpleDoubleTimer.h>
 
-#define AVERAGING_BUFFER_SIZE 2
+#define AVERAGING_BUFFER_SIZE 3
 
 class BikePc
 {
