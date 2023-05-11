@@ -8,6 +8,9 @@
 // values update time interval
 #define UPDATE_TIME_MS 1000
 
+// time interval before values on screen are reset
+#define TIMEOUT_TIME_MS 10000
+
 // LCD I2C Address
 #define LCD_ADDR 0x27
 

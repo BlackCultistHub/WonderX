@@ -8,16 +8,19 @@
 // Diplay
 // Defaults to SDA SCL of board
 
-// Speed
+// Speed ISR pin
 #define SPEED_PIN 2
 
-// Cadence
+// Cadence ISR pin
 #define CADENCE_PIN 3
 
-// RF
-#define RF_RX_PIN 0
+// RF data
+// defaults to MOSI of board
 
 // Reset
 #define RESET_PIN 4
+
+// Control
+#define CONTROL_PIN 5
 
 #endif // end file guardian

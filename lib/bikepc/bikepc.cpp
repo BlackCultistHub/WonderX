@@ -37,7 +37,17 @@ namespace
                 elems++;
             }
         }
-        return (summary / elems);
+        return (summary / (!elems?1:elems));
+    }
+
+    template< typename T >
+    void WipeBuffer( T* buffer, uint16_t size )
+    {
+        for ( int i = 0; i < AVERAGING_BUFFER_SIZE; i++ )
+        {
+            buffer[i] = 0;
+        }
+        return;
     }
 }
 
@@ -45,6 +55,9 @@ BikePc::BikePc( uint8_t lcdAddress, uint8_t lcdCols, uint8_t lcdRows, uint16_t w
 lcd( lcdAddress, lcdCols, lcdRows ),
 wheelRadius( wheelRad )
 {
+    WipeBuffer( velocityBuffer, AVERAGING_BUFFER_SIZE );
+    WipeBuffer( cadenceBuffer, AVERAGING_BUFFER_SIZE );
+    WipeBuffer( heartrateBuffer, AVERAGING_BUFFER_SIZE );
 }
 
 void BikePc::Init( bool resetOnStart )
@@ -131,6 +144,15 @@ int BikePc::UpdateHeartrate( uint8_t heartrate )
         lcd.UpdateHeartrate( getHeartrate( heartrate ) );
     }
     return 0;
+}
+
+void BikePc::TimeOutBike()
+{
+    WipeBuffer( velocityBuffer, AVERAGING_BUFFER_SIZE );
+    lcd.UpdateVelocity( 0 );
+
+    WipeBuffer( cadenceBuffer, AVERAGING_BUFFER_SIZE );
+    lcd.UpdateCadence( 0 );
 }
 
 int BikePc::updateTripOdo()

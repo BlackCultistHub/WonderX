@@ -49,6 +49,9 @@ public:
     // @param[in] heartrate heartrate value
     int UpdateHeartrate( uint8_t heartrate );
 
+    // @brief Resets onscreen values of velocity and cadence
+    void TimeOutBike();
+
 
 private:
     // @brief updates trip and odo
@@ -63,9 +66,9 @@ private:
 private:
     LcdExtended lcd;
 
-    uint16_t velocityBuffer[AVERAGING_BUFFER_SIZE];
-    uint16_t cadenceBuffer[AVERAGING_BUFFER_SIZE];
-    uint8_t heartrateBuffer[AVERAGING_BUFFER_SIZE];
+    uint16_t velocityBuffer[AVERAGING_BUFFER_SIZE] = {};
+    uint16_t cadenceBuffer[AVERAGING_BUFFER_SIZE] = {};
+    uint8_t heartrateBuffer[AVERAGING_BUFFER_SIZE] = {};
 
     // @brief radius of the wheel in mm
     uint16_t wheelRadius = 0;

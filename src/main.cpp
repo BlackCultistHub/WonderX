@@ -17,10 +17,11 @@ algorithms::SimpleDoubleTimer spdTmr;
 // @brief cadence timer
 algorithms::SimpleDoubleTimer cadTmr;
 // @brief update timer
-algorithms::SimpleTimer updTmr;
+algorithms::SimpleTimer timeoutTmr;
 // ISR triggers
 volatile bool updateSpeed = false;
 volatile bool updateCadence = false;
+bool updateHeartrate = false;
 // control object
 BikePc bpc(LCD_ADDR, LCD_COLS, LCD_ROWS, 250); // CHANGE WHEEL RADIUS ========= TEMPORARY
 // heartrate buffer
@@ -67,12 +68,24 @@ void setup()
 
 void loop() 
 {
+  {
+    if ( timeoutTmr.GetDiff() >= TIMEOUT_TIME_MS )
+    {
+      timeoutTmr.Update();
+      bpc.TimeOutBike();
+    }
+  }
+  {
+    // recieve && read signature
+    // sign = OK -> updateHeartrate = true
+  }
   if ( updateSpeed )
   {
     delay( 100 );
     updateSpeed = false;
     bpc.UpdateSpeed( spdTmr );
     spdTmr.Update();
+    timeoutTmr.Update();
   }
   if ( updateCadence )
   {
@@ -80,19 +93,12 @@ void loop()
     updateCadence = false;
     bpc.UpdateCadence( cadTmr );
     cadTmr.Update();
+    timeoutTmr.Update();
   }
-
-  // Recieve heartrate
-//  short heartrate = heartrate_sensor::RecieveHeartRate();
-
-  // Update values once a second
-  //if ( updTmr.GetDiff() >= UPDATE_TIME_MS )
+  if ( updateHeartrate )
   {
-    // update time
-    //updTmr.Update();
-    // update values
-    
+    delay( 100 );
+    updateHeartrate = false;
     //bpc.UpdateHeartrate( heartrate );
   }
-
 }
