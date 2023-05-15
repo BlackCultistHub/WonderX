@@ -35,8 +35,8 @@ volatile bool updateCadence = false;
 bool updateHeartrate = false;
 // control object
 BikePc bpc( LCD_ADDR, LCD_COLS, LCD_ROWS, SETUP_WHEEL_RADIUS_DEFAULT );
-// heartrate buffer
-uint8_t heartrate = 0;
+// heartrate object
+HRSensor hrs;
 
 // === ISRs ===
 // ISR Speed
@@ -55,9 +55,6 @@ void SetupMenu();
 
 void setup() 
 {
-  //DEBUG
-  Serial.begin(9600); //DBG
-
   // RESET registering
   pinMode( RESET_PIN, INPUT_PULLUP );
   bool reset = false;
@@ -90,8 +87,7 @@ void setup()
   pinMode( CADENCE_PIN, INPUT_PULLUP );
   attachInterrupt( digitalPinToInterrupt( CADENCE_PIN ), CadenceISR, FALLING );
 
-  Serial.println("setup done"); //DBG
-
+  hrs.Init();
 }
 
 void loop() 
@@ -129,9 +125,11 @@ void loop()
       bpc.LightPowerSave();
     }
   }
-  { // RF Heartrate
-    // recieve && read signature
-    // sign = OK -> updateHeartrate = true
+  { // RF Heartrate RX
+    if ( hrs.CheckHeartRate() )
+    {
+      updateHeartrate = true;
+    }
   }
   if ( updateSpeed )
   {
@@ -161,7 +159,7 @@ void loop()
   {
     delay( 100 );
     updateHeartrate = false;
-    //bpc.UpdateHeartrate( heartrate );
+    bpc.UpdateHeartrate( hrs.GetHeartRate() );
   }
 }
 
