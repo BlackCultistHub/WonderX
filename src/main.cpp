@@ -119,7 +119,7 @@ void loop()
     }
   }
   { // Timeout screen
-    if ( screenTmr.GetDiff() >= SCREEN_POWEROFF_TIMEOUT_MIN * 60 * 1000 )
+    if ( screenTmr.GetDiff() >= ((uint64_t)SCREEN_POWEROFF_TIMEOUT_MIN * (uint64_t)60 * (uint64_t)1000) )
     {
       screenTmr.Update();
       bpc.LightPowerSave();

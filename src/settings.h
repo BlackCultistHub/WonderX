@@ -49,6 +49,6 @@
 
 // ========== POWER ==========
 
-#define SCREEN_POWEROFF_TIMEOUT_MIN 3
+#define SCREEN_POWEROFF_TIMEOUT_MIN 1
 
 #endif // end file guardian
