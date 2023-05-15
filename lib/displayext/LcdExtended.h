@@ -33,6 +33,11 @@ public:
 
     // @brief Disables backlight
     void Dimm();
+
+    // @brief runs setup screen
+    void Setup();
+    void SetupUpdateNumber( uint16_t nmb );
+    void SetupDone();
     
     // @brief Updates onscreen velocity value
     // @param[in] velocity velocity value (0-999)
@@ -63,6 +68,10 @@ private:
 
     // @brief draws basic interface
     void drawBase();
+
+    // @brief draw setup screens
+    void drawSetup();
+    void drawSetupDone();
 
     // @brief draws number with size control (0-999)
     void drawControlledNumber( uint16_t number, uint8_t basicCol, uint8_t row );

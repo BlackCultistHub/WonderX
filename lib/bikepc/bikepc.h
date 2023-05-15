@@ -14,7 +14,7 @@
 #include <size_conversions.h>
 #include <simpleDoubleTimer.h>
 
-#define AVERAGING_BUFFER_SIZE 3
+#include "defaults.h"
 
 class BikePc
 {
@@ -25,11 +25,19 @@ public:
     // @param[in] lcdCols amount of cols
     // @param[in] lcdRows amount of rows
     // @param[in] wheelRad radius of the wheel in mm
-    BikePc( uint8_t lcdAddress, uint8_t lcdCols, uint8_t lcdRows, uint16_t wheelRad );
+    BikePc( uint8_t lcdAddress, uint8_t lcdCols, uint8_t lcdRows, uint16_t wheelRadiusDefault );
 
     // @brief Inits bikepc
     // @param[in] resetOnStart true if hard reset is needed
-    void Init( bool resetOnStart = false );
+    void Init( bool resetOnStart = false, bool wheelSetup = false );
+
+    // @brief Updates wheel radius
+    // @param[in] wheelRad radius of the wheel in mm (nullptr for reset to default 300mm)
+    // @param[in] confirm if true - writes wheel radius and resets
+    void UpdateWheel( uint16_t* wheelRad, bool confirm = false );
+
+    // @brief Draws end setup screen
+    void EndSetup();
 
     // @brief Triggers hard reset
     int HardReset();
@@ -52,6 +60,10 @@ public:
     // @brief Resets onscreen values of velocity and cadence
     void TimeOutBike();
 
+    void LightPowerSave();
+
+    void QuitPowerSave();
+
 
 private:
     // @brief updates trip and odo
@@ -72,6 +84,8 @@ private:
 
     // @brief radius of the wheel in mm
     uint16_t wheelRadius = 0;
+
+    uint16_t wheelRadiusDefault; //mm
 
     uint32_t rideBuffer = 0; //buffer in mm
     uint32_t trip = 0; // cm

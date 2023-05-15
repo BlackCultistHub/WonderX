@@ -47,6 +47,21 @@ void LcdExtended::Dimm()
     noBacklight();
 }
 
+void LcdExtended::Setup()
+{
+    drawSetup();
+}
+
+void LcdExtended::SetupUpdateNumber( uint16_t nmb )
+{
+    drawControlledNumber( nmb, 5, 1 );
+}
+
+void LcdExtended::SetupDone()
+{
+    drawSetupDone();
+}
+
 void LcdExtended::UpdateVelocity( uint8_t velocity )
 {
     if ( velocity > 999 )
@@ -106,6 +121,29 @@ void LcdExtended::drawReset()
     print("Resetting");
     setCursor( 2, 1 );
     print("to factory..");
+}
+
+void LcdExtended::drawSetup()
+{
+    clear();
+    // ________________ (ref)
+    //   Radius (mm):       
+    //      XXX
+    setCursor( 3, 0 );
+    print( "Radius (mm):" );
+    drawControlledNumber( 0, 5, 1 );
+}
+
+void LcdExtended::drawSetupDone()
+{
+    clear();
+    // ________________ (ref)
+    //   Setup Done!       
+    //  Release button 
+    setCursor( 3, 0 );
+    print( "Setup Done!" );
+    setCursor( 2, 1 );
+    print( "Release button" );
 }
 
 void LcdExtended::drawBase()

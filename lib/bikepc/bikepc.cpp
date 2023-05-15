@@ -51,21 +51,36 @@ namespace
     }
 }
 
-BikePc::BikePc( uint8_t lcdAddress, uint8_t lcdCols, uint8_t lcdRows, uint16_t wheelRad ):
+BikePc::BikePc( uint8_t lcdAddress, uint8_t lcdCols, uint8_t lcdRows, uint16_t wheelRadDefault ):
 lcd( lcdAddress, lcdCols, lcdRows ),
-wheelRadius( wheelRad )
+wheelRadiusDefault( wheelRadDefault )
 {
     WipeBuffer( velocityBuffer, AVERAGING_BUFFER_SIZE );
     WipeBuffer( cadenceBuffer, AVERAGING_BUFFER_SIZE );
     WipeBuffer( heartrateBuffer, AVERAGING_BUFFER_SIZE );
 }
 
-void BikePc::Init( bool resetOnStart )
+void BikePc::Init( bool resetOnStart, bool wheelSetup )
 {
     lcd.Init();
+    {
+        // @todo Error handling if EEPROM has good value but fails to read
+        wheelRadius = eeprom_ops::GetWheelRadius();
+
+        // error correction if EEPROM has bad value
+        if ( !wheelRadius )
+        {
+            wheelRadius = wheelRadiusDefault;
+        }
+    }
     if ( resetOnStart )
     {
         HardReset();
+    }
+    else if ( wheelSetup )
+    {
+        lcd.Setup();
+        UpdateWheel( nullptr, false );
     }
     else
     {
@@ -82,11 +97,39 @@ void BikePc::Init( bool resetOnStart )
     }
 }
 
+void BikePc::UpdateWheel( uint16_t* wheelRad, bool confirm )
+{
+    if ( wheelRad != nullptr )
+    {
+        lcd.SetupUpdateNumber( *wheelRad );
+        if ( confirm )
+        {
+            wheelRadius = *wheelRad;
+            eeprom_ops::WriteWheelRad( wheelRadius );
+        }
+    }
+    else
+    {
+        lcd.SetupUpdateNumber( wheelRadiusDefault );
+        if ( confirm )
+        {
+            eeprom_ops::WriteWheelRad( wheelRadiusDefault );
+            wheelRadius = wheelRadiusDefault;
+        }
+    }
+}
+
+void BikePc::EndSetup()
+{
+    lcd.SetupDone();
+}
+
 int BikePc::HardReset()
 {
     // @todo error handling
     lcd.Reset();
     eeprom_flashing::WipeEEPROM();
+    eeprom_ops::WriteWheelRad( wheelRadiusDefault );
     delay( 1000 );
     lcd.Start( 0, 0 );
     return 0;
@@ -153,6 +196,16 @@ void BikePc::TimeOutBike()
 
     WipeBuffer( cadenceBuffer, AVERAGING_BUFFER_SIZE );
     lcd.UpdateCadence( 0 );
+}
+
+void BikePc::LightPowerSave()
+{
+    lcd.Dimm();
+}
+
+void BikePc::QuitPowerSave()
+{
+    lcd.Bright();
 }
 
 int BikePc::updateTripOdo()
